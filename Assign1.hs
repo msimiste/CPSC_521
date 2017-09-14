@@ -27,7 +27,5 @@ greaterInList _ [] = []
 greaterInList x ys = foldr (\b acc  -> if b > x  then b:acc else acc) [] ys
 
 msplit:: [a] -> ([a],[a])
-msplit xs = (e,o) 
-    where
-        e = foldr (\b acc -> if (mod b 2 == 0) then b:acc else acc)[] xs
-        o = foldr (\b acc -> if (mod b 2 == 1) then b:acc else acc)[] xs
+msplit xs = foldr (\x  (e,o) n -> if n mod 2 == 0 then (x:e,o) else (e,x:o) ) ([],[]) xs 0
+
