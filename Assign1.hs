@@ -1,3 +1,4 @@
+-- Do questions 1,2,5,6,7,8,11,12,17,20,21. You should do the other questions in class, labs, and on your own!
 
 --1. Write your own function for appending two lists and for reversing a list: app:: ([a],[a]) -> [a], rev:: [a] -> [a].  Now define your own data type for lists and write the append function for this datatype.
 myApp:: ([a],[a]) -> [a]
@@ -10,7 +11,7 @@ myRev xs = rev xs []
         rev [] a = a
         rev (x:xs) ys = rev xs (x:ys)
         
- --2. Write your own function for flattening a list of lists to a list: flatten :: [[a]] -> [a]. Write a flatten function for your own datatype for lists       
+--2. Write your own function for flattening a list of lists to a list: flatten :: [[a]] -> [a]. Write a flatten function for your own datatype for lists       
 myFlatten:: [[a]] -> [a]
 myFlatten []  = []
 myFlatten xs = foldl(\acc x -> x ++ acc)[] xs
@@ -26,10 +27,11 @@ greaterinlist x ys = foldr (\b acc  -> if b > x  then b:acc else acc) [] ys
 --5. Write a function which splits a list into two lists, the first containing the odd indexed elements and the second containing the even indexed elements: msplit:: [a] -> ([a],[a]).
 msplit:: [a] -> ([a],[a])
 msplit [] = ([],[])
-msplit xs = (evens,odds)
-    where
-        evens = keepEvens 0 xs
-        odds = keepOdds 0 xs
+msplit xs = ([head xs], [head[head xs]])
+-- msplit xs = (evens,odds)
+    -- where
+        -- evens = keepEvens 0 xs
+        -- odds = keepOdds 0 xs
 
 keepEvens:: Integer -> [a] -> [a]
 keepEvens _ [] = []
@@ -42,14 +44,34 @@ keepOdds c (x:xs) = if c `mod` 2 == 1 then x:(keepOdds (c+1) xs) else keepOdds (
 --6. Write a function to merge two lists of integers, taking the least first element at each step: mergeInt :: ([Integer],[Integer]) -> [Integer] 
 mergeInt:: ([Integer],[Integer]) -> [Integer]
 mergeInt ([],[]) = []
+mergeInt([x],[]) = [x]
 mergeInt ([],[x]) = [x]
-mergeInt ([x],[]) = [x]
-mergeInt ((x:xs),(y:ys)) = (min x y):(mergeInt (xs,ys))
-
-
+mergeInt ([x],[y]) = [(min x y), (max x y)]
+mergeInt (xs,[]) = mergeInt (splitAt n xs)
+    where n = length xs `div` 2
+mergeInt ([],xs) = mergeInt (splitAt n xs)
+    where n = length xs `div` 2
+mergeInt ([x],(y:ys))
+    | (x < y) = x:(mergeInt (splitAt n (y:ys)))        
+    | otherwise = y:(mergeInt([x],ys))
+    where n = length (y:ys) `div` 2
+mergeInt ((x:xs),[y])
+    | (y < x) = y:(mergeInt(splitAt n (x:xs)))        
+    | otherwise = x:(mergeInt(xs,[y]))
+    where n = length (x:xs) `div` 2
+--mergeInt (xs,ys) = (min (head xs) (head ys)):(mergeInt ((tail xs), (tail ys)))
+--mergeInt ((x:xs),(y:ys)) = (min x y):(mergeInt (xs,ys))
+mergeInt((x:xs), (y:ys))
+    | (x < y) = x:(mergeInt(xs, (y:ys)))
+    | otherwise = y:(mergeInt((x:xs), ys))
+     
 mergesortInt:: [Integer] -> [Integer]
-mergesortInt [] -> []
-mergesortInt x:xs
+mergesortInt [] = []
+mergesortInt [x,y] = mergeInt([x],[y])
+mergesortInt xs = mergeInt (splitAt n xs)
+    where  n = (length xs) `div` 2
+--mergesortInt [x,y] = mergeInt ([x],[y])
+--mergesortInt xs = mergesortInt(mergeInt (splitAt (length xs `div` 2) xs))
  
 --7. Write a mergesort for integers:  mergesortInt :: [Integer] -> [Integer].
 --8. Generalize the mergesort to arbitrary ordered type (using the class system).
