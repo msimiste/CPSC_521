@@ -47,23 +47,29 @@ mergeInt ([],[]) = []
 mergeInt([x],[]) = [x]
 mergeInt ([],[x]) = [x]
 mergeInt ([x],[y]) = [(min x y), (max x y)]
-mergeInt (xs,[]) = mergeInt (splitAt n xs)
-    where n = length xs `div` 2
-mergeInt ([],xs) = mergeInt (splitAt n xs)
-    where n = length xs `div` 2
-mergeInt ([x],(y:ys))
-    | (x < y) = x:(mergeInt (splitAt n (y:ys)))        
-    | otherwise = y:(mergeInt([x],ys))
-    where n = length (y:ys) `div` 2
-mergeInt ((x:xs),[y])
-    | (y < x) = y:(mergeInt(splitAt n (x:xs)))        
-    | otherwise = x:(mergeInt(xs,[y]))
-    where n = length (x:xs) `div` 2
+mergeInt (xs,ys) = case (xs,ys) of ([],ys) -> mergeInt (splitAt n ys)
+                                   (xs,[]) -> mergeInt (splitAt m xs
+                                   ((x:_),(y:_)) -> if x < y then x:mergeInt(xs,(y:ys)) else y:mergeInt((x:xs),ys)
+                                        where
+                                            n = length ys `div` 2
+                                            m = length xs `div` 2 
+-- mergeInt (xs,[]) = mergeInt (splitAt n xs)
+    -- where n = length xs `div` 2
+-- mergeInt ([],xs) = mergeInt (splitAt n xs)
+    -- where n = length xs `div` 2
+-- mergeInt ([x],(y:ys))
+    -- | (x < y) = x:(mergeInt (splitAt n (y:ys)))        
+    -- | otherwise = y:(mergeInt([x],ys))
+    -- where n = length (y:ys) `div` 2
+-- mergeInt ((x:xs),[y])
+    -- | (y < x) = y:(mergeInt(splitAt n (x:xs)))        
+    -- | otherwise = x:(mergeInt(xs,[y]))
+    -- where n = length (x:xs) `div` 2
 --mergeInt (xs,ys) = (min (head xs) (head ys)):(mergeInt ((tail xs), (tail ys)))
 --mergeInt ((x:xs),(y:ys)) = (min x y):(mergeInt (xs,ys))
-mergeInt((x:xs), (y:ys))
-    | (x < y) = x:(mergeInt(xs, (y:ys)))
-    | otherwise = y:(mergeInt((x:xs), ys))
+--mergeInt((x:xs), (y:ys))
+--    | (x < y) = x:(mergeInt(xs, (y:ys)))
+--    | otherwise = y:(mergeInt((x:xs), ys))
      
 mergesortInt:: [Integer] -> [Integer]
 mergesortInt [] = []
