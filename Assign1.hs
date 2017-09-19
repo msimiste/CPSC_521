@@ -44,47 +44,54 @@ keepOdds c (x:xs) = if c `mod` 2 == 1 then x:(keepOdds (c+1) xs) else keepOdds (
 --6. Write a function to merge two lists of integers, taking the least first element at each step: mergeInt :: ([Integer],[Integer]) -> [Integer] 
 mergeInt:: ([Integer],[Integer]) -> [Integer]
 mergeInt ([],[]) = []
-mergeInt([x],[]) = [x]
-mergeInt ([],[x]) = [x]
-mergeInt ([x],[y]) = [(min x y), (max x y)]
-mergeInt (xs,ys) = case (xs,ys) of ([],ys) -> mergeInt (splitAt n ys)
-                                   (xs,[]) -> mergeInt (splitAt m xs
-                                   ((x:_),(y:_)) -> if x < y then x:mergeInt(xs,(y:ys)) else y:mergeInt((x:xs),ys)
-                                        where
-                                            n = length ys `div` 2
-                                            m = length xs `div` 2 
--- mergeInt (xs,[]) = mergeInt (splitAt n xs)
-    -- where n = length xs `div` 2
--- mergeInt ([],xs) = mergeInt (splitAt n xs)
-    -- where n = length xs `div` 2
--- mergeInt ([x],(y:ys))
-    -- | (x < y) = x:(mergeInt (splitAt n (y:ys)))        
-    -- | otherwise = y:(mergeInt([x],ys))
-    -- where n = length (y:ys) `div` 2
--- mergeInt ((x:xs),[y])
-    -- | (y < x) = y:(mergeInt(splitAt n (x:xs)))        
-    -- | otherwise = x:(mergeInt(xs,[y]))
-    -- where n = length (x:xs) `div` 2
---mergeInt (xs,ys) = (min (head xs) (head ys)):(mergeInt ((tail xs), (tail ys)))
---mergeInt ((x:xs),(y:ys)) = (min x y):(mergeInt (xs,ys))
---mergeInt((x:xs), (y:ys))
---    | (x < y) = x:(mergeInt(xs, (y:ys)))
---    | otherwise = y:(mergeInt((x:xs), ys))
-     
+mergeInt(xs,[]) = xs
+mergeInt ([],xs) = xs
+mergeInt((x:xs),(y:ys)) 
+    | x < y = x:mergeInt(xs,(y:ys))
+    | otherwise = y:mergeInt((x:xs),ys)
+
+--7. Write a mergesort for integers:  mergesortInt :: [Integer] -> [Integer].     
 mergesortInt:: [Integer] -> [Integer]
 mergesortInt [] = []
-mergesortInt [x,y] = mergeInt([x],[y])
-mergesortInt xs = mergeInt (splitAt n xs)
-    where  n = (length xs) `div` 2
---mergesortInt [x,y] = mergeInt ([x],[y])
---mergesortInt xs = mergesortInt(mergeInt (splitAt (length xs `div` 2) xs))
- 
---7. Write a mergesort for integers:  mergesortInt :: [Integer] -> [Integer].
+mergesortInt [x,y] = [min x y, max x y ]
+mergesortInt xs = mergeInt (mergesortInt a, mergesortInt b)
+    where  
+        (a,b) = splitAt n xs 
+        n = (length xs) `div` 2 
+    
 --8. Generalize the mergesort to arbitrary ordered type (using the class system).
+mergeGen:: (Ord a) => ([a],[a]) -> [a]
+mergeGen ([],[]) = []
+mergeGen(xs,[]) = xs
+mergeGen ([],xs) = xs
+mergeGen((x:xs),(y:ys)) 
+    | x < y = x:mergeGen(xs,(y:ys))
+    | otherwise = y:mergeGen((x:xs),ys)
+    
+merge:: (Ord a) => [a] -> [a]
+merge [] = []
+merge [x,y] = mergeGen([x],[y])
+merge xs = mergeGen (merge a, merge b)
+    where  
+        (a,b) = splitAt n xs 
+        n = (length xs) `div` 2 
 
 -- ++9. Write a quicksort for an arbitrary ordered type: quicksort:: (Ord a) => [a] -> [a].
 -- ++10. Write a function which determines whether an element (of equality type) is in a list: member:: (Eq a) => a -> [a] -> Bool.
---11. Given a relation rel:: a -> b -> Bool and a list of a-elements and a list of b-elements write a function which returns a list of pairs of an a-element and the list of b-elements from the second list to which it is related: relgrp:: (a -> b -> Bool) -> [a] -> [b] -> [(a,[b])].  For example if the relation is the divide relation then relgrp div [2,3] [1,2,3,4,5,6] = [(2,[2,4,6]),(3,[3,6])]].
+
+--11. Given a relation rel:: a -> b -> Bool and a list of a-elements and a list of b-elements write a 
+--function which returns a list of pairs of an a-element and the list of b-elements from the second 
+--list to which it is related: relgrp:: (a -> b -> Bool) -> [a] -> [b] -> [(a,[b])].  
+--For example if the relation is the divide relation then 
+--relgrp div [2,3] [1,2,3,4,5,6] = [(2,[2,4,6]),(3,[3,6])]].
+
+--relgrp:: (a -> b -> Bool) -> [a] -> [b] -> [(a,[b])]
+--relgrp f [] bs = []
+--relgrp f as [] = []
+--relgrp f (a:as) (b:bs) = (a,(filter (f a bs))):(relgrp f as bs)
+
+
+
 --12. Program the "group" function: given a predicate pred:: a -> a -> Bool and a list the group function breaks the list into a series of (maximal) sublists such that any two consecutive elements satisfy the predicate pred.   The type of the function group is group:: (a -> a -> Bool) -> [a] -> [[a]].  An example of its use is as follows: suppose that the predicate nbr determines whether the absolute difference of two integers is at most 1 (i.e. they are equal or they differ by one) then group nbr [2,1,3,4,5,5,4,7,4,3,3] = [[2,1],[3,4,5,5,4],[7],[4,3,3]] : program up this example to make sure your group works.  What is group nbr []?
 -- ++13. Write a function which given a list returns a list of all the subsets of the list: subset:: [a] -> [[a]].
 -- ++14. Write a function which given a list returns the list of all permutations of that list: perm:: [a] -> [[a]].  As a bonus: given a permutation it is possible to give its cyclic decomposition. For example the permutation [2,4,5,1,3] of [1,2,3,4,5] can be represented as [[1,2,4],[3,5]] where this indicates that each element goes to it neighbor unless it is at the end of a sublist in which case it goes to the first in the sublist.
