@@ -86,7 +86,11 @@ merge xs = mergeGen (merge a, merge b)
 relgrp:: (a -> b -> Bool) -> [a] -> [b] -> [(a,[b])]
 relgrp f [] bs = []
 relgrp f as [] = []
-relgrp f (a:as) (b:bs) = (a, filter (f a) (b:bs)):(relgrp f as (b:bs))
+relgrp f (a:as) (b:bs) = case (a, filter (f a) (b:bs)) of 
+    (_,[]) -> relgrp f as (b:bs)                             
+    (x,_) -> d:(relgrp f as (b:bs))
+        where d =(a, filter (f a) (b:bs))
+                                         
 
 
 --12. Program the "group" function: given a predicate pred:: a -> a -> Bool and a list the group function breaks the list into a series of (maximal) sublists such that any two consecutive elements satisfy the predicate pred.   The type of the function group is group:: (a -> a -> Bool) -> [a] -> [[a]].  An example of its use is as follows: suppose that the predicate nbr determines whether the absolute difference of two integers is at most 1 (i.e. they are equal or they differ by one) then group nbr [2,1,3,4,5,5,4,7,4,3,3] = [[2,1],[3,4,5,5,4],[7],[4,3,3]] : program up this example to make sure your group works.  What is group nbr []?
