@@ -27,12 +27,10 @@ greaterinlist x ys = foldr (\b acc  -> if b > x  then b:acc else acc) [] ys
 --5. Write a function which splits a list into two lists, the first containing the odd indexed elements and the second containing the even indexed elements: msplit:: [a] -> ([a],[a]).
 msplit:: [a] -> ([a],[a])
 msplit [] = ([],[])
-msplit xs = ([head xs], [head[head xs]])
--- msplit xs = (evens,odds)
-    -- where
-        -- evens = keepEvens 0 xs
-        -- odds = keepOdds 0 xs
+msplit [x] = ([x],[])
+msplit (x:y:xs) = (x:(fst (msplit xs)),y:(snd (msplit xs)))
 
+--helper for 5, no longer needed
 keepEvens:: Integer -> [a] -> [a]
 keepEvens _ [] = []
 keepEvens c (x:xs) = if c `mod` 2 == 0 then x:(keepEvens (c+1) xs) else keepEvens (c+1) xs
@@ -86,14 +84,36 @@ merge xs = mergeGen (merge a, merge b)
 relgrp:: (a -> b -> Bool) -> [a] -> [b] -> [(a,[b])]
 relgrp f [] bs = []
 relgrp f as [] = []
-relgrp f (a:as) (b:bs) = case (a, filter (f a) (b:bs)) of 
-    (_,[]) -> relgrp f as (b:bs)                             
-    (x,_) -> d:(relgrp f as (b:bs))
-        where d =(a, filter (f a) (b:bs))
-                                         
+relgrp f (a:as) bs = case (a, filter (f a) bs) of 
+    (_,[]) -> relgrp f as bs                             
+    (x,_) -> d:(relgrp f as bs)
+        where d =(a, filter (f a) bs)                                  
 
+--12. Program the "group" function: given a predicate pred:: a -> a -> Bool and a list, 
+--the group function breaks the list into a series of (maximal) sublists such that any two consecutive 
+--elements satisfy the predicate, pred. 
+--The type of the function group is group:: (a -> a -> Bool) -> [a] -> [[a]]. 
+-- An example of its use is as follows: suppose that the predicate nbr determines whether the absolute 
+--difference of two integers is at most 1 (i.e. they are equal or they differ by one) then group nbr 
+--[2,1,3,4,5,5,4,7,4,3,3] = [[2,1],[3,4,5,5,4],[7],[4,3,3]] : program up this example to make sure your 
+---group works.  What is group nbr []?
 
---12. Program the "group" function: given a predicate pred:: a -> a -> Bool and a list the group function breaks the list into a series of (maximal) sublists such that any two consecutive elements satisfy the predicate pred.   The type of the function group is group:: (a -> a -> Bool) -> [a] -> [[a]].  An example of its use is as follows: suppose that the predicate nbr determines whether the absolute difference of two integers is at most 1 (i.e. they are equal or they differ by one) then group nbr [2,1,3,4,5,5,4,7,4,3,3] = [[2,1],[3,4,5,5,4],[7],[4,3,3]] : program up this example to make sure your group works.  What is group nbr []?
+nbr:: Integer -> Integer -> Bool
+nbr x y
+    | abs (x - y) <= 1 = True
+    | otherwise = False
+    
+group:: (a -> a -> Bool) -> [a] -> [[a]]
+group f [] = []
+group f (x:y:xs) =   (helpGrp f x (y:xs)):(group f (y:xs))
+
+helpGrp:: (a -> a -> Bool) -> a -> [a] -> [a]
+helpGrp f a [] = []
+helpGrp f a [x] = case (f a x) of True -> [a,x]
+                                  False -> [a]
+helpGrp f a (x:xs) = case (f a x) of True -> a:(helpGrp f x xs)
+                                     False -> [a]
+
 -- ++13. Write a function which given a list returns a list of all the subsets of the list: subset:: [a] -> [[a]].
 -- ++14. Write a function which given a list returns the list of all permutations of that list: perm:: [a] -> [[a]].  As a bonus: given a permutation it is possible to give its cyclic decomposition. For example the permutation [2,4,5,1,3] of [1,2,3,4,5] can be represented as [[1,2,4],[3,5]] where this indicates that each element goes to it neighbor unless it is at the end of a sublist in which case it goes to the first in the sublist.
 -- ++15. Write a function to turn decimal numbers into roman numerals and a function for the reverse translation (here is one solution, here is another).
@@ -107,7 +127,6 @@ relgrp f (a:as) (b:bs) = case (a, filter (f a) (b:bs)) of
 fact:: Integer -> Integer 
 fact 0  = 1
 fact n = n * fact(n-1)
-
 --   factorial of 1891 =  10239307937318092035935715998267909916105924069923343459039300333411621494
 --                        04719679358313030103629307499537675502273121155012574786008799074535267323
 --                        48139697879240205809193824182578272238546947414141452728122331630359609722
