@@ -19,7 +19,8 @@ myFlatten xs = foldl(\acc x -> x ++ acc)[] xs
 --3, Write a function which given a number and a list of numbers returns those numbers greater than the first number: greaterinlist:: Integer -> [Integer] -> [Integer].
 greaterinlist:: Integer -> [Integer] -> [Integer]
 greaterinlist _ [] = []
-greaterinlist x ys = foldr (\b acc  -> if b > x  then b:acc else acc) [] ys
+greaterinlist x ys = filter (>x) ys
+--greaterinlist x ys = foldr (\b acc  -> if b > x  then b:acc else acc) [] ys
 
 --4. Write a function to determine whether its first argument, a list of integers, is lexicographically larger than its second argument: lexInt::[Int] -> [Int] -> Bool.   Now modify it to work on any type in class Ord. Finally can you modify the Ord class to include lexicographical orderings of lists.
 
@@ -35,6 +36,7 @@ keepEvens:: Integer -> [a] -> [a]
 keepEvens _ [] = []
 keepEvens c (x:xs) = if c `mod` 2 == 0 then x:(keepEvens (c+1) xs) else keepEvens (c+1) xs
 
+--helper for 5, no longer needed
 keepOdds:: Integer -> [a] -> [a]
 keepOdds _ [] = []
 keepOdds c (x:xs) = if c `mod` 2 == 1 then x:(keepOdds (c+1) xs) else keepOdds (c+1) xs
@@ -105,14 +107,15 @@ nbr x y
     
 group:: (a -> a -> Bool) -> [a] -> [[a]]
 group f [] = []
+group f [x] = []
 group f (x:y:xs) =   (helpGrp f x (y:xs)):(group f (y:xs))
 
 helpGrp:: (a -> a -> Bool) -> a -> [a] -> [a]
 helpGrp f a [] = []
 helpGrp f a [x] = case (f a x) of True -> [a,x]
-                                  False -> [a]
+                                  False -> []
 helpGrp f a (x:xs) = case (f a x) of True -> a:(helpGrp f x xs)
-                                     False -> [a]
+                                     False -> [x]
 
 -- ++13. Write a function which given a list returns a list of all the subsets of the list: subset:: [a] -> [[a]].
 -- ++14. Write a function which given a list returns the list of all permutations of that list: perm:: [a] -> [[a]].  As a bonus: given a permutation it is possible to give its cyclic decomposition. For example the permutation [2,4,5,1,3] of [1,2,3,4,5] can be represented as [[1,2,4],[3,5]] where this indicates that each element goes to it neighbor unless it is at the end of a sublist in which case it goes to the first in the sublist.
