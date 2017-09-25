@@ -14,7 +14,7 @@ myRev xs = rev xs []
 --2. Write your own function for flattening a list of lists to a list: flatten :: [[a]] -> [a]. Write a flatten function for your own datatype for lists       
 myFlatten:: [[a]] -> [a]
 myFlatten []  = []
-myFlatten xs = foldl(\acc x -> x ++ acc)[] xs
+myFlatten xs = foldr (\acc x -> x ++ acc)[] xs
               
 --3, Write a function which given a number and a list of numbers returns those numbers greater than the first number: greaterinlist:: Integer -> [Integer] -> [Integer].
 greaterinlist:: Integer -> [Integer] -> [Integer]
@@ -91,6 +91,14 @@ relgrp f (a:as) bs = case (a, filter (f a) bs) of
     (x,_) -> d:(relgrp f as bs)
         where d =(a, filter (f a) bs)                                  
 
+--In order to test relgrp function seen above
+div':: Integer -> Integer -> Bool
+div' 0 b = False
+div' a 0 = True
+div' a b
+   | (b `mod` a) == 0 = True
+   | otherwise = False
+   
 --12. Program the "group" function: given a predicate pred:: a -> a -> Bool and a list, 
 --the group function breaks the list into a series of (maximal) sublists such that any two consecutive 
 --elements satisfy the predicate, pred. 
@@ -102,29 +110,64 @@ relgrp f (a:as) bs = case (a, filter (f a) bs) of
 
 nbr:: Integer -> Integer -> Bool
 nbr x y
-    | abs (x - y) <= 1 = True
+    | (x - y) == 0 = True
+    | abs (x - y) == 1 = True
     | otherwise = False
     
 group:: (a -> a -> Bool) -> [a] -> [[a]]
-group f [] = []
-group f [x] = []
-group f (x:y:xs) =   (helpGrp f x (y:xs)):(group f (y:xs))
+group _ [] = []
+group f (x:xs) = (x:ys): group f zs where
+    (ys,zs) = span (f x) xs
+--group f xs = takeWhile nbr 
+--group f [x,y] = (helpGrp f x [y]):[]
+ -- (ys,zs) = span (f x y) xs
+--group f (x:y:xs) =   (helpGrp f x (y:xs)):(group f (y:xs))
 
 helpGrp:: (a -> a -> Bool) -> a -> [a] -> [a]
 helpGrp f a [] = []
 helpGrp f a [x] = case (f a x) of True -> [a,x]
                                   False -> []
 helpGrp f a (x:xs) = case (f a x) of True -> a:(helpGrp f x xs)
-                                     False -> [x]
+                                     False -> []
 
 -- ++13. Write a function which given a list returns a list of all the subsets of the list: subset:: [a] -> [[a]].
 -- ++14. Write a function which given a list returns the list of all permutations of that list: perm:: [a] -> [[a]].  As a bonus: given a permutation it is possible to give its cyclic decomposition. For example the permutation [2,4,5,1,3] of [1,2,3,4,5] can be represented as [[1,2,4],[3,5]] where this indicates that each element goes to it neighbor unless it is at the end of a sublist in which case it goes to the first in the sublist.
 -- ++15. Write a function to turn decimal numbers into roman numerals and a function for the reverse translation (here is one solution, here is another).
 -- ++16. Write programs to do basic matrix addition and multiplication.   For this excercise I want you  to regard a matrix as a list of lists of numbers and to define the operations in terms of the following primitive functions.  You will need a function to xzip two lists together which reports an error if they are not the same length (there is a zip in the prelude which does not report an error).  You will need the map function in the prelude.  You will need to write a function which transposes a matrix transpose:: [[a]] -> [[a]]  and to form the dot product of two vectors.   You should be able to paste these basic functions together to define matrix multiplication.  
+
 --17. Write a function for adding and multiplying polynomials.  You may represent the polynomials as lists of real numbers so [1,0,3,4.2] = 1 + 3x^2 +4.2x^3.   Thus addpoly:: [Float]  -> [Float] -> [Float] and multpoly:: [Float]  -> [Float] -> [Float].
+addPoly:: [Float] -> [Float] -> [Float]
+addPoly [] ys = ys
+addPoly xs [] = xs
+addPoly [x] (y:ys) = (x + y):(addPoly [] ys) 
+addPoly (x:xs) (y:ys) = (x + y):(addPoly xs ys)
+
+multPoly:: [Float] -> [Float] -> [Float]
+multPoly [] _ = []
+multPoly (x:xs) ys = final where
+    first = multBy x ys
+    rest = shiftByOne $ multPoly xs ys
+    final = addPoly first rest
+
+--helper function multiplies all elements of a list by n
+multBy:: Float -> [Float] -> [Float]
+multBy n xs = map (n*) xs
+
+--helper function shifts the elements of a list to the right by 1 
+shiftByOne:: [Float] -> [Float]
+shiftByOne xs = 0:xs
+
 -- ++18. Write a function which given a list of (real) roots of a polynomial produces a (real) polynomial with those roots.
 -- ++19. Write a function which given a polynomial (as above) and a real number evaluates the poynomial at that number: evalpoly:: [Float]->Float -> Float.
 --20. An expression tree (or term) is the datatype data ETree = Var String | Opn  String [ETree].  A typical element is Opn "add" [Var "x1",Var "x2"]  (which is an internal representation of x1 + x2 ).   Write a function varsof:: Etree -> [String] which collects the set of variable in the expression (or term).  Thus, varsof(Opn "add" [Var "x1",Var "x2"]) = ["x1","x2"].   Be careful to ensure that variables only occur once in the output list.
+
+data ETree = Var String | Opn String [ETree]
+
+varsof:: ETree -> [String]
+varsof (Var s) = [s]
+varsof (Opn s et ) = foldr( \e acc -> (varsof e) ++ acc) [] et
+    
+    
  
  --21. Calculate the factorial of 1,891 or explain six different ways of programming factorial.
 fact:: Integer -> Integer 

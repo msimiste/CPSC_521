@@ -11,6 +11,8 @@ module Shapes
 , treeElem
 ) where
 
+import Text.Read
+
 data Point = Point Float Float deriving (Show)
 data Shape = Circle Point Float | Rectangle Point Point deriving (Show)
 data Day = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday   
@@ -45,3 +47,19 @@ class Blah a where
 (./=):: a -> a -> Bool
 x .== y = not (x ./= y)
 x ./= y = not (x .== y)
+
+interactiveSumming = do
+    putStrLn "Choose 2 nums"
+    sx <- getLine
+    sy <- getLine
+    let mx = readMaybe sx :: Maybe Double
+        my = readMaybe sy :: Maybe Double
+    case mx of
+        Just x -> case my of
+            Just y -> putStrLn ("Sum is: " ++ show (x + y))
+            Nothing -> retry
+        Nothing -> retry
+    where
+    retry = do
+        putStrLn "Invalid"
+        interactiveSumming
