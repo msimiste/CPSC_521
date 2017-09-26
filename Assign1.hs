@@ -5,12 +5,16 @@ myApp:: ([a],[a]) -> [a]
 myApp ([], ys)= ys
 myApp ((x:xs),ys) = x:(myApp(xs,ys))
 
+--myRev:: [a] -> [a]
+--myRev xs = rev xs []
+--    where
+--        rev [] a = a
+--        rev (x:xs) ys = rev xs (x:ys)
+
 myRev:: [a] -> [a]
-myRev xs = rev xs []
-    where
-        rev [] a = a
-        rev (x:xs) ys = rev xs (x:ys)
-        
+myRev [x] = [x]
+myRev xs = (last xs):(myRev (init xs)) 
+ 
 --2. Write your own function for flattening a list of lists to a list: flatten :: [[a]] -> [a]. Write a flatten function for your own datatype for lists       
 myFlatten:: [[a]] -> [a]
 myFlatten []  = []
@@ -134,7 +138,7 @@ nbr x y
 -- ++13. Write a function which given a list returns a list of all the subsets of the list: subset:: [a] -> [[a]].
 -- ++14. Write a function which given a list returns the list of all permutations of that list: perm:: [a] -> [[a]].  As a bonus: given a permutation it is possible to give its cyclic decomposition. For example the permutation [2,4,5,1,3] of [1,2,3,4,5] can be represented as [[1,2,4],[3,5]] where this indicates that each element goes to it neighbor unless it is at the end of a sublist in which case it goes to the first in the sublist.
 -- ++15. Write a function to turn decimal numbers into roman numerals and a function for the reverse translation (here is one solution, here is another).
--- ++16. Write programs to do basic matrix addition and multiplication.   For this excercise I want you  to regard a matrix as a list of lists of numbers and to define the operations in terms of the following primitive functions.  You will need a function to xzip two lists together which reports an error if they are not the same length (there is a zip in the prelude which does not report an error).  You will need the map function in the prelude.  You will need to write a function which transposes a matrix transpose:: [[a]] -> [[a]]  and to form the dot product of two vectors.   You should be able to paste these basic functions together to define matrix multiplication.  
+-- ++16. Write programs to do basic matrix addition and multiplication.   For this excercise I want you  to regard a matrix as a list of lists of numbers and to define the operations in terms of the following primitive functions.  You will need a function to xzip two lists together which reports an error if they are not the same length (there is a zip in the prelude which does not report an error).  You will need the map function in the prelude.  You will need to write a function which transposes a matrix transpose:: [[a]] -> [[a]]  and to formad the dot product of two vectors.   You should be able to paste these basic functions together to define matrix multiplication.  
 
 --17. Write a function for adding and multiplying polynomials.  You may represent the polynomials as lists of real numbers so [1,0,3,4.2] = 1 + 3x^2 +4.2x^3.   Thus addpoly:: [Float]  -> [Float] -> [Float] and multpoly:: [Float]  -> [Float] -> [Float].
 addPoly:: [Float] -> [Float] -> [Float]

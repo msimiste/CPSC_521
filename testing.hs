@@ -1,20 +1,25 @@
-module MyTests
-(
-
-) where
-
-import System.Environment
+data Tree a = Leaf a | Branch (Tree a) (Tree a) deriving (Show)
+--data [a] = [] | (a:[a])
 
 
-data Bool' = True' | False'   deriving (Show)
+map' :: (a -> b) -> [a] -> [b]
+map' _ [] = []
+map' f (x:xs) = f x : map f xs
 
-data Nat = Zero | Succ Nat deriving (Show, Eq, Ord, Read)
-  
-  
-and':: Bool' -> Bool' -> Bool
-and' True' True' = True
-and' _ _ = False
+treeMap':: (a -> b) -> Tree a -> Tree b
+treeMap' f (Leaf x) = Leaf (f x)
+treeMap' f (Branch lt rt) = Branch (treeMap' f lt) (treeMap' f rt)
 
-add':: Nat-> Nat-> Nat
-add' Zero n = n
-add' (Succ m) n = Succ (add' m n)
+tree1 :: Tree Integer
+tree1 = 
+    Branch
+       (Branch 
+           (Branch 
+               (Leaf 1) 
+               (Branch (Leaf 2) (Leaf 3))) 
+           (Branch 
+               (Leaf 4) 
+               (Branch (Leaf 5) (Leaf 6)))) 
+       (Branch
+           (Branch (Leaf 7) (Leaf 8)) 
+           (Leaf 9))
