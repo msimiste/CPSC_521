@@ -1,6 +1,8 @@
 -- Do questions 1,2,5,6,7,8,11,12,17,20,21. You should do the other questions in class, labs, and on your own!
 
---1. Write your own function for appending two lists and for reversing a list: app:: ([a],[a]) -> [a], rev:: [a] -> [a].  Now define your own data type for lists and write the append function for this datatype.
+--1. Write your own function for appending two lists and for reversing a list: 
+--app:: ([a],[a]) -> [a], rev:: [a] -> [a].  
+--Now define your own data type for lists and write the append function for this datatype.
 myApp:: ([a],[a]) -> [a]
 myApp ([], ys)= ys
 myApp ((x:xs),ys) = x:(myApp(xs,ys))
@@ -112,23 +114,32 @@ div' a b
 --[2,1,3,4,5,5,4,7,4,3,3] = [[2,1],[3,4,5,5,4],[7],[4,3,3]] : program up this example to make sure your 
 ---group works.  What is group nbr []?
 
-nbr:: Integer -> Integer -> Bool
+nbr::(Eq a, Num a) => a -> a -> Bool
 nbr x y
     | (x - y) == 0 = True
     | abs (x - y) == 1 = True
     | otherwise = False
-    
---group:: (a -> a -> Bool) -> [a] -> [[a]]
---group _ [] = []
---group _ [x] = [[x]]
---group f [x,y] = if (f x x) && (f x y) then [[x,y]] else [[x]]
---group f (x:y:xs) = if (f x y) then (x:(helpGrp f y xs)) : (group f xs) else [[x]]
+
+group:: (a -> a -> Bool) -> [a] -> [[a]]
+group _ [] = []
+group _ [x] = [[x]]
+group f [x,y] = if (f x y) then [[x,y]] else [[x]]
+group f (x:y:xs) = case (f x y) of
+    True -> final where
+        (keep,drop) = span (group f y) xs
+        final = [x,y]:keep:(group f drop)
+    False -> group f (y:xs)
+--    True -> (takeWhile (f x) (y:ys)) : (group f 
+--    False -> (x:(group f y xs))
 ----group f xs = takeWhile nbr 
 ----group f [x,y] = (helpGrp f x [y]):[]
 -- -- (ys,zs) = span (f x y) xs
 ----group f (x:y:xs) =   (helpGrp f x (y:xs)):(group f (y:xs))
 --
 --helpGrp:: (a -> a -> Bool) -> a -> [a] -> [a]
+--helpGrp f n (x:xs) = case (f n x) of
+--    True ->  takeWhile (f n) xs
+--    False -> group f (x:xs)
 --helpGrp f a [] = []
 --helpGrp f a [x] = case (f a x) of True -> [a,x]
 --                                  False -> [a]
