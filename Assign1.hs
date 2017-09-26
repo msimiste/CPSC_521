@@ -7,28 +7,35 @@ myApp:: ([a],[a]) -> [a]
 myApp ([], ys)= ys
 myApp ((x:xs),ys) = x:(myApp(xs,ys))
 
+
+myRev:: [a] -> [a]
+myRev [] = []
+myRev [x] = [x]
+myRev xs = (last xs):(myRev (init xs))
+
 --myRev:: [a] -> [a]
 --myRev xs = rev xs []
 --    where
 --        rev [] a = a
 --        rev (x:xs) ys = rev xs (x:ys)
 
-myRev:: [a] -> [a]
-myRev [x] = [x]
-myRev xs = (last xs):(myRev (init xs)) 
- 
+
+
 --2. Write your own function for flattening a list of lists to a list: flatten :: [[a]] -> [a]. Write a flatten function for your own datatype for lists       
 myFlatten:: [[a]] -> [a]
 myFlatten []  = []
 myFlatten xs = foldr (\acc x -> x ++ acc)[] xs
               
---3, Write a function which given a number and a list of numbers returns those numbers greater than the first number: greaterinlist:: Integer -> [Integer] -> [Integer].
+-- ++3, Write a function which given a number and a list of numbers returns those numbers greater than the first number: greaterinlist:: Integer -> [Integer] -> [Integer].
 greaterinlist:: Integer -> [Integer] -> [Integer]
 greaterinlist _ [] = []
 greaterinlist x ys = filter (>x) ys
 --greaterinlist x ys = foldr (\b acc  -> if b > x  then b:acc else acc) [] ys
 
---4. Write a function to determine whether its first argument, a list of integers, is lexicographically larger than its second argument: lexInt::[Int] -> [Int] -> Bool.   Now modify it to work on any type in class Ord. Finally can you modify the Ord class to include lexicographical orderings of lists.
+-- ++4. Write a function to determine whether its first argument, a list of integers, is lexicographically 
+--larger than its second argument: lexInt::[Int] -> [Int] -> Bool.   
+--Now modify it to work on any type in class Ord.
+-- Finally can you modify the Ord class to include lexicographical orderings of lists.
 
 
 --5. Write a function which splits a list into two lists, the first containing the odd indexed elements and the second containing the even indexed elements: msplit:: [a] -> ([a],[a]).
@@ -124,11 +131,13 @@ group:: (a -> a -> Bool) -> [a] -> [[a]]
 group _ [] = []
 group _ [x] = [[x]]
 group f [x,y] = if (f x y) then [[x,y]] else [[x]]
-group f (x:y:xs) = case (f x y) of
-    True -> final where
-        (keep,drop) = span (group f y) xs
-        final = [x,y]:keep:(group f drop)
-    False -> group f (y:xs)
+group f xs =  [] ++ foldr(\acc x -> case acc of
+    [] -> x ++ acc
+    ys -> if (f x (last (last(ys)))) then acc ++ (last ys) ++ [x] else [x] ++ acc) xs []
+--    True -> final where
+--        (keep,drop) = span (group f y) xs
+--        final = [x,y]:keep:(group f drop)
+--    False -> group f (y:xs)
 --    True -> (takeWhile (f x) (y:ys)) : (group f 
 --    False -> (x:(group f y xs))
 ----group f xs = takeWhile nbr 
@@ -151,7 +160,9 @@ group f (x:y:xs) = case (f x y) of
 -- ++15. Write a function to turn decimal numbers into roman numerals and a function for the reverse translation (here is one solution, here is another).
 -- ++16. Write programs to do basic matrix addition and multiplication.   For this excercise I want you  to regard a matrix as a list of lists of numbers and to define the operations in terms of the following primitive functions.  You will need a function to xzip two lists together which reports an error if they are not the same length (there is a zip in the prelude which does not report an error).  You will need the map function in the prelude.  You will need to write a function which transposes a matrix transpose:: [[a]] -> [[a]]  and to formad the dot product of two vectors.   You should be able to paste these basic functions together to define matrix multiplication.  
 
---17. Write a function for adding and multiplying polynomials.  You may represent the polynomials as lists of real numbers so [1,0,3,4.2] = 1 + 3x^2 +4.2x^3.   Thus addpoly:: [Float]  -> [Float] -> [Float] and multpoly:: [Float]  -> [Float] -> [Float].
+--17. Write a function for adding and multiplying polynomials.  
+--You may represent the polynomials as lists of real numbers so [1,0,3,4.2] = 1 + 3x^2 +4.2x^3.   
+--Thus addpoly:: [Float]  -> [Float] -> [Float] and multpoly:: [Float]  -> [Float] -> [Float].
 addPoly:: [Float] -> [Float] -> [Float]
 addPoly [] ys = ys
 addPoly xs [] = xs
@@ -175,15 +186,27 @@ shiftByOne xs = 0:xs
 
 -- ++18. Write a function which given a list of (real) roots of a polynomial produces a (real) polynomial with those roots.
 -- ++19. Write a function which given a polynomial (as above) and a real number evaluates the poynomial at that number: evalpoly:: [Float]->Float -> Float.
---20. An expression tree (or term) is the datatype data ETree = Var String | Opn  String [ETree].  A typical element is Opn "add" [Var "x1",Var "x2"]  (which is an internal representation of x1 + x2 ).   Write a function varsof:: Etree -> [String] which collects the set of variable in the expression (or term).  Thus, varsof(Opn "add" [Var "x1",Var "x2"]) = ["x1","x2"].   Be careful to ensure that variables only occur once in the output list.
 
+
+--20. An expression tree (or term) is the datatype data ETree = Var String | Opn  String [ETree].  
+--A typical element is Opn "add" [Var "x1",Var "x2"]  (which is an internal representation of x1 + x2 ).
+--Write a function varsof:: Etree -> [String] which collects the set of variable in the expression (or term)
+--Thus, varsof(Opn "add" [Var "x1",Var "x2"]) = ["x1","x2"].   
+--Be careful to ensure that variables only occur once in the output list.
 data ETree = Var String | Opn String [ETree]
 
 varsof:: ETree -> [String]
 varsof (Var s) = [s]
-varsof (Opn s et ) = foldr( \e acc -> (varsof e) ++ acc) [] et
-    
-    
+varsof (Opn s et ) = final where
+    final = merge $ removeDupes $ foldr(\eTree acc -> (varsof eTree) ++ acc) [] et
+
+--helper function for Q20    
+removeDupes::(Eq a, Ord a) => [a] -> [a]
+removeDupes [] = []
+removeDupes [a] = [a]
+removeDupes (x:xs) = case (x ` elem` xs) of
+        True -> removeDupes xs
+        False -> x:(removeDupes xs)
  
  --21. Calculate the factorial of 1,891 or explain six different ways of programming factorial.
 fact:: Integer -> Integer 
