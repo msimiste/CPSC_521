@@ -114,21 +114,22 @@ nbr x y
     | abs (x - y) == 1 = True
     | otherwise = False
     
-group:: (a -> a -> Bool) -> [a] -> [[a]]
-group _ [] = []
-group f (x:xs) = (x:ys): group f zs where
-    (ys,zs) = span (f x) xs
---group f xs = takeWhile nbr 
---group f [x,y] = (helpGrp f x [y]):[]
- -- (ys,zs) = span (f x y) xs
---group f (x:y:xs) =   (helpGrp f x (y:xs)):(group f (y:xs))
-
-helpGrp:: (a -> a -> Bool) -> a -> [a] -> [a]
-helpGrp f a [] = []
-helpGrp f a [x] = case (f a x) of True -> [a,x]
-                                  False -> []
-helpGrp f a (x:xs) = case (f a x) of True -> a:(helpGrp f x xs)
-                                     False -> []
+--group:: (a -> a -> Bool) -> [a] -> [[a]]
+--group _ [] = []
+--group _ [x] = [[x]]
+--group f [x,y] = if (f x x) && (f x y) then [[x,y]] else [[x]]
+--group f (x:y:xs) = if (f x y) then (x:(helpGrp f y xs)) : (group f xs) else [[x]]
+----group f xs = takeWhile nbr 
+----group f [x,y] = (helpGrp f x [y]):[]
+-- -- (ys,zs) = span (f x y) xs
+----group f (x:y:xs) =   (helpGrp f x (y:xs)):(group f (y:xs))
+--
+--helpGrp:: (a -> a -> Bool) -> a -> [a] -> [a]
+--helpGrp f a [] = []
+--helpGrp f a [x] = case (f a x) of True -> [a,x]
+--                                  False -> [a]
+--helpGrp f a (x:xs) = case (f a x) of True -> a:(helpGrp f x xs)
+--                                     False -> group f (x:xs)
 
 -- ++13. Write a function which given a list returns a list of all the subsets of the list: subset:: [a] -> [[a]].
 -- ++14. Write a function which given a list returns the list of all permutations of that list: perm:: [a] -> [[a]].  As a bonus: given a permutation it is possible to give its cyclic decomposition. For example the permutation [2,4,5,1,3] of [1,2,3,4,5] can be represented as [[1,2,4],[3,5]] where this indicates that each element goes to it neighbor unless it is at the end of a sublist in which case it goes to the first in the sublist.
