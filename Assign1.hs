@@ -1,17 +1,20 @@
+-- CPSC521-F2017
+-- Mike Simister 10095107
+-- Sept 26, 2017
 -- Do questions 1,2,5,6,7,8,11,12,17,20,21. You should do the other questions in class, labs, and on your own!
 
 --1. Write your own function for appending two lists and for reversing a list: 
---app:: ([a],[a]) -> [a], rev:: [a] -> [a].  
---Now define your own data type for lists and write the append function for this datatype.
-myApp:: ([a],[a]) -> [a]
-myApp ([], ys)= ys
-myApp ((x:xs),ys) = x:(myApp(xs,ys))
+--app:: ([a],[a]) -> [a], 
+--rev:: [a] -> [a].  
+app:: ([a],[a]) -> [a]
+app ([], ys)= ys
+app ((x:xs),ys) = x:(app(xs,ys))
 
 
-myRev:: [a] -> [a]
-myRev [] = []
-myRev [x] = [x]
-myRev xs = (last xs):(myRev (init xs))
+rev:: [a] -> [a]
+rev [] = []
+rev [x] = [x]
+rev xs = (last xs):(rev (init xs))
 
 --myRev:: [a] -> [a]
 --myRev xs = rev xs []
@@ -20,11 +23,22 @@ myRev xs = (last xs):(myRev (init xs))
 --        rev (x:xs) ys = rev xs (x:ys)
 
 
+--Now define your own data type for lists and write the append function for this datatype.
+
+-- Data Type was taken from class notes
+data MyList a = Nil | Cons a (MyList a) deriving (Eq, Ord, Read, Show)
+
+myListApp :: (MyList a, MyList a) -> MyList a
+myListApp (Nil, xs) = xs
+myListApp ((Cons x (xs)) ,ys) =  Cons x (myListApp (xs, ys))
 
 --2. Write your own function for flattening a list of lists to a list: flatten :: [[a]] -> [a]. Write a flatten function for your own datatype for lists       
-myFlatten:: [[a]] -> [a]
-myFlatten []  = []
-myFlatten xs = foldr (\acc x -> x ++ acc)[] xs
+flatten:: [[a]] -> [a]
+flatten []  = []
+flatten xs = foldr (\acc x -> acc ++ x)[] xs
+
+--myFlatten:: MyList MyList a -> MyList a
+--myFlatten mls a
               
 -- ++3, Write a function which given a number and a list of numbers returns those numbers greater than the first number: greaterinlist:: Integer -> [Integer] -> [Integer].
 greaterinlist:: Integer -> [Integer] -> [Integer]
@@ -127,13 +141,27 @@ nbr x y
     | abs (x - y) == 1 = True
     | otherwise = False
 
-group:: (a -> a -> Bool) -> [a] -> [[a]]
-group _ [] = []
-group _ [x] = [[x]]
-group f [x,y] = if (f x y) then [[x,y]] else [[x]]
-group f xs =  [] ++ foldr(\acc x -> case acc of
-    [] -> x ++ acc
-    ys -> if (f x (last (last(ys)))) then acc ++ (last ys) ++ [x] else [x] ++ acc) xs []
+--group:: (a -> a -> Bool) -> [a] -> [[a]]
+--group _ [] = []
+--group _ [x] = [[x]]
+--group f [x,y] = if (f x y) then [[x,y]] else [[x]]
+--group f (xs) = map (\y -> map (\x -> helper f x y) xs) (tail xs)
+
+helper:: (a -> a -> Bool) -> a -> [a] -> [a]
+helper f x (y:z:zs) = case (f x y) of 
+        True -> x:(helper f y (z:zs))
+        False -> [x]
+--group f (x:y:xs) = case (f x y) of
+--    True -> x:helper(y:xs) ++ (group f xs)
+--    False -> [x] ++ (group f (y:xs))
+--    
+    
+--group f xs =  [foldl(\acc x -> case acc of 
+--    [] -> x : acc
+--    yz -> do
+--        ys <- myFlatten yz
+--        yt <- if (f (last (last x)) (last ys)) then acc ++ (last ys) else x ++ acc
+--        return yt) [] xs ]
 --    True -> final where
 --        (keep,drop) = span (group f y) xs
 --        final = [x,y]:keep:(group f drop)
@@ -163,18 +191,18 @@ group f xs =  [] ++ foldr(\acc x -> case acc of
 --17. Write a function for adding and multiplying polynomials.  
 --You may represent the polynomials as lists of real numbers so [1,0,3,4.2] = 1 + 3x^2 +4.2x^3.   
 --Thus addpoly:: [Float]  -> [Float] -> [Float] and multpoly:: [Float]  -> [Float] -> [Float].
-addPoly:: [Float] -> [Float] -> [Float]
-addPoly [] ys = ys
-addPoly xs [] = xs
-addPoly [x] (y:ys) = (x + y):(addPoly [] ys) 
-addPoly (x:xs) (y:ys) = (x + y):(addPoly xs ys)
+addpoly:: [Float] -> [Float] -> [Float]
+addpoly [] ys = ys
+addpoly xs [] = xs
+addpoly [x] (y:ys) = (x + y):(addpoly [] ys) 
+addpoly (x:xs) (y:ys) = (x + y):(addpoly xs ys)
 
-multPoly:: [Float] -> [Float] -> [Float]
-multPoly [] _ = []
-multPoly (x:xs) ys = final where
+multpoly:: [Float] -> [Float] -> [Float]
+multpoly [] _ = []
+multpoly (x:xs) ys = final where
     first = multBy x ys
-    rest = shiftByOne $ multPoly xs ys
-    final = addPoly first rest
+    rest = shiftByOne $ multpoly xs ys
+    final = addpoly first rest
 
 --helper function multiplies all elements of a list by n
 multBy:: Float -> [Float] -> [Float]
@@ -204,7 +232,7 @@ varsof (Opn s et ) = final where
 removeDupes::(Eq a, Ord a) => [a] -> [a]
 removeDupes [] = []
 removeDupes [a] = [a]
-removeDupes (x:xs) = case (x ` elem` xs) of
+removeDupes (x:xs) = case (x `elem` xs) of
         True -> removeDupes xs
         False -> x:(removeDupes xs)
  
