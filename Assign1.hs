@@ -145,66 +145,9 @@ group:: (a -> a -> Bool) -> [a] -> [[a]]
 group _ [] = []
 group _ [x] = [[x]]
 group f xs = foldr(\x acc -> case acc of
-    [] -> [x]:acc
-    --[[y]] -> if (f x y) then [x]:(group else [x] : acc
-    ys -> if (f x (head (flatten ys))) then (( ([x] ++ (head (ys)) ++ (tail ys) )) : acc) else acc)[] xs
-    --(z:zs) -> if (f x (last(flatten (z:zs)))) then [x]:acc else [x]:acc)[] xs
+    [] -> [x]:acc    
+    ys -> if (f x (head (flatten ys))) then (([x] ++ (head (ys))) : (drop 1 acc)) else [x]:acc)[] xs
 
-     
-    
-        
-           
---group fy = last ys [x,y] = if (f x y) then [[x,y]] else [[x]]
---group f (y:xs) = foldl(\acc x -> acc ++ x) [] (map (helper2) (map (f y) xs))
--- Taken from Haskell Data.List
---group _  []     =  []
---group f (x:y:xs) =  (x:ys) : group f zs
---    where (ys,zs) = span (f y) xs
--- ^^Taken from Haskell Data.List
-
---group f (xs) = map (\x y -> if (f x y) then x else []) ((takeWhile (\r s -> (f r s)) xs) xs)
-
-    
-helper:: (a -> a -> Bool) -> a -> [a] -> [a]
-helper f x (y:z:zs) = case (f x y) of 
-        True -> x:(helper f y (z:zs))
-        False -> [x]
-        
-helper2::(a -> a -> Bool) -> a -> a -> [a]
-helper2 f x y = case (f x y) of
-    True -> [x,y]
-    False -> [x]
---group f (x:y:xs) = case (f x y) of
---    True -> x:helper(y:xs) ++ (group f xs)
---    False -> [x] ++ (group f (y:xs))
---    
-    
---group f xs =  [foldl(\acc x -> case acc of 
---    [] -> x : acc
---    yz -> do
---        ys <- myFlatten yz
---        yt <- if (f (last (last x)) (last ys)) then acc ++ (last ys) else x ++ acc
---        return yt) [] xs ]
---    True -> final where
---        (keep,drop) = span (group f y) xs
---        final = [x,y]:keep:(group f drop)
---    False -> group f (y:xs)
---    True -> (takeWhile (f x) (y:ys)) : (group f 
---    False -> (x:(group f y xs))
-----group f xs = takeWhile nbr 
-----group f [x,y] = (helpGrp f x [y]):[]
--- -- (ys,zs) = span (f x y) xs
-----group f (x:y:xs) =   (helpGrp f x (y:xs)):(group f (y:xs))
---
---helpGrp:: (a -> a -> Bool) -> a -> [a] -> [a]
---helpGrp f n (x:xs) = case (f n x) of
---    True ->  takeWhile (f n) xs
---    False -> group f (x:xs)
---helpGrp f a [] = []
---helpGrp f a [x] = case (f a x) of True -> [a,x]
---                                  False -> [a]
---helpGrp f a (x:xs) = case (f a x) of True -> a:(helpGrp f x xs)
---                                     False -> group f (x:xs)
 
 -- ++13. Write a function which given a list returns a list of all the subsets of the list: subset:: [a] -> [[a]].
 -- ++14. Write a function which given a list returns the list of all permutations of that list: perm:: [a] -> [[a]].  As a bonus: given a permutation it is possible to give its cyclic decomposition. For example the permutation [2,4,5,1,3] of [1,2,3,4,5] can be represented as [[1,2,4],[3,5]] where this indicates that each element goes to it neighbor unless it is at the end of a sublist in which case it goes to the first in the sublist.
