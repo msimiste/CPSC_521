@@ -37,8 +37,8 @@ flatten:: [[a]] -> [a]
 flatten []  = []
 flatten xs = foldr (\acc x -> acc ++ x)[] xs
 
---myFlatten:: MyList MyList a -> MyList a
---myFlatten mls a
+--myFlatten:: MyList (MyList a) -> MyList a
+--myFlatten mls = foldr(\acc x -> acc ++ x) [] mls
               
 -- ++3, Write a function which given a number and a list of numbers returns those numbers greater than the first number: greaterinlist:: Integer -> [Integer] -> [Integer].
 greaterinlist:: Integer -> [Integer] -> [Integer]
@@ -141,16 +141,39 @@ nbr x y
     | abs (x - y) == 1 = True
     | otherwise = False
 
---group:: (a -> a -> Bool) -> [a] -> [[a]]
---group _ [] = []
---group _ [x] = [[x]]
---group f [x,y] = if (f x y) then [[x,y]] else [[x]]
---group f (xs) = map (\y -> map (\x -> helper f x y) xs) (tail xs)
+group:: (a -> a -> Bool) -> [a] -> [[a]]
+group _ [] = []
+group _ [x] = [[x]]
+group f xs = foldr(\x acc -> case acc of
+    [] -> [x]:acc
+    --[[y]] -> if (f x y) then [x]:(group else [x] : acc
+    ys -> if (f x (head (flatten ys))) then (( ([x] ++ (head (ys)) ++ (tail ys) )) : acc) else acc)[] xs
+    --(z:zs) -> if (f x (last(flatten (z:zs)))) then [x]:acc else [x]:acc)[] xs
 
+     
+    
+        
+           
+--group fy = last ys [x,y] = if (f x y) then [[x,y]] else [[x]]
+--group f (y:xs) = foldl(\acc x -> acc ++ x) [] (map (helper2) (map (f y) xs))
+-- Taken from Haskell Data.List
+--group _  []     =  []
+--group f (x:y:xs) =  (x:ys) : group f zs
+--    where (ys,zs) = span (f y) xs
+-- ^^Taken from Haskell Data.List
+
+--group f (xs) = map (\x y -> if (f x y) then x else []) ((takeWhile (\r s -> (f r s)) xs) xs)
+
+    
 helper:: (a -> a -> Bool) -> a -> [a] -> [a]
 helper f x (y:z:zs) = case (f x y) of 
         True -> x:(helper f y (z:zs))
         False -> [x]
+        
+helper2::(a -> a -> Bool) -> a -> a -> [a]
+helper2 f x y = case (f x y) of
+    True -> [x,y]
+    False -> [x]
 --group f (x:y:xs) = case (f x y) of
 --    True -> x:helper(y:xs) ++ (group f xs)
 --    False -> [x] ++ (group f (y:xs))
