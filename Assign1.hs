@@ -142,11 +142,14 @@ nbr x y
     | otherwise = False
 
 group:: (a -> a -> Bool) -> [a] -> [[a]]
-group _ [] = []
-group _ [x] = [[x]]
 group f xs = foldr(\x acc -> case acc of
-    [] -> [x]:acc    
-    ys -> if (f x (head (flatten ys))) then (([x] ++ (head (ys))) : (drop 1 acc)) else [x]:acc)[] xs
+    [] -> [x]:acc
+    ((y:ys):zs) -> case (f x y) of
+        True -> ((x:(y:ys)) : zs)
+        False -> [x]:((y:ys):zs))[] xs  
+    
+     
+--    ys -> if (f x (head (flatten ys))) then (([x] ++ (head (ys))) : (drop 1 acc)) else [x]:acc)[] xs
 
 
 -- ++13. Write a function which given a list returns a list of all the subsets of the list: subset:: [a] -> [[a]].
