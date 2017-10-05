@@ -149,7 +149,8 @@ group f xs = foldr(\x acc -> case acc of
         False -> [x]:((y:ys):zs))[] xs  
     
 generally::[(a,[b])] -> [(a,b)]
-generally list = foldr(\(a,xs) acc ->  (foldr(\t ac -> (a,t):ac)acc xs))[] list
+--generally list = foldr(\(a,xs) acc ->  (foldr(\t ac -> (a,t):ac)acc xs))[] list
+generally list = foldr(\(a,xs) acc ->  (map (\t -> (a,t)) xs) ++ acc)[] list
 --generally list = concatMap (\(a,xs) -> fmap(\x -> (a,x)) xs)  list  
 --    ys -> if (f x (head (flatten ys))) then (([x] ++ (head (ys))) : (drop 1 acc)) else [x]:acc)[] xs
 
